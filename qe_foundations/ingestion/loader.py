@@ -47,7 +47,7 @@ class IngestionReport:
 
             test_cases_messy.csv: 10 rows seen, 3 valid, 7 rejected
         """
-        raise NotImplementedError("Task 6A: write IngestionReport.summary")
+        return f"{self.source}: {self.rows_seen} rows seen, {len(self.valid)} valid, {len(self.rejected)} rejected" 
 
     def rejected_rows(self):
         """TODO (6A): the rejected records as plain dicts, ordered by row number.
@@ -55,7 +55,11 @@ class IngestionReport:
         Each dict has exactly the keys: "source", "row", "field", "reason"
         ("reason" is the text of the exception, str(error)).
         """
-        raise NotImplementedError("Task 6A: write IngestionReport.rejected_rows")
+        rows = [
+            {"source": self.source, "row": e.row, "field": e.field, "reason": str(e)}
+            for e in self.rejected
+        ]
+        return sorted(rows, key=lambda r: r["row"])
 
     def check_invariants(self):
         """TODO (6B): use `assert` statements to check OUR OWN bookkeeping.
@@ -63,7 +67,14 @@ class IngestionReport:
         Three invariants (README Task 6B). Each assert gets a helpful message.
         A failure here would be a BUG in this module, not bad input data.
         """
-        raise NotImplementedError("Task 6B: write IngestionReport.check_invariants")
+        assert len(self.valid)+len(self.rejected)==self.rows_seen, "The length of valid and rejected is not the length of rows seen"
+        seen = set()
+        for row in self.valid:
+            assert not row['id'] in seen, "Duplicate ids exists"
+            seen.add(row['id'])
+        for error in self.rejected:
+            assert isinstance(error, RecordValidationError), "Rejcted includes non Record Validation Errors"
+        return self
 
 
 class BatchResult:
@@ -78,7 +89,13 @@ class BatchResult:
 
             "files_ok", "files_failed", "valid", "rejected"
         """
-        raise NotImplementedError("Task 6D: write BatchResult.totals")
+        valid = 0
+        rejected = 0
+        for report in self.reports:
+            valid += len(report.valid) 
+            rejected += len(report.rejected)
+
+        return {"files_ok": len(self.reports), "files_failed": len(self.failed_sources), "valid": valid, "rejected": rejected}
 
 
 def load_test_cases(path):
@@ -92,7 +109,46 @@ def load_test_cases(path):
     * a repeated id -> DuplicateIdError for the LATER occurrence (the first one stays valid)
     * call report.check_invariants() before returning
     """
-    raise NotImplementedError("Task 6C: write load_test_cases")
+    with LoadSession(path):
+        if isinstance(path, str):
+            suf = '.'
+            name, _ = path.split('.')
+            suf += _
+        else:
+            suf = path.suffix
+            name = path.name
+        if suf.lower() in READERS:
+            reader = READERS[suf.lower()]
+        else:
+            raise UnsupportedFormatError(path, suf)
+
+        try:
+            data = reader(path)
+        except SourceError as e:
+            raise e
+
+        row = 1
+        rejected = []
+        valid = []
+        for d in data:
+            try:
+                val = validate_record(row, d)
+                for v in valid:
+                    if val["id"] in v["id"]:
+                        raise DuplicateIdError(row, val["id"])
+                row += 1
+                valid.append(val)
+            except RecordValidationError as e:
+                rejected.append(e)
+                row+=1
+        #Becuase row starts at 1 we -1
+        report = IngestionReport(name, row-1)
+        report.valid = valid
+        report.rejected = rejected
+        return report.check_invariants()
+
+
+
 
 
 def load_directory(folder):
@@ -102,7 +158,28 @@ def load_directory(folder):
     * a bad FILE never stops the batch: collect its SourceError in failed_sources
     * a folder that does not exist (or is not a folder) -> raise SourceNotFoundError(folder)
     """
-    raise NotImplementedError("Task 6D: write load_directory")
+    try:
+        files = [f for f in folder.iterdir() if f.is_file()]
+    except FileNotFoundError as e:
+        raise SourceNotFoundError(folder)
+    sources = []
+    failed_sources = []
+    for file in files:
+        try:
+            sources.append(load_test_cases(file))
+        except SourceError as e:
+            failed_sources.append(e)
+        except Exception as e:
+            raise e
+    
+    sources = sorted(sources, key=lambda r: r.source)
+    batch = BatchResult()
+    for source in sources:
+        batch.reports.append(source)
+    for source in failed_sources:
+        batch.failed_sources.append(source)
+
+    return batch
 
 
 def write_rejected_csv(report, out_path):
@@ -111,4 +188,9 @@ def write_rejected_csv(report, out_path):
     Header exactly: source,row,field,reason     (use csv.DictWriter)
     Create the parent folder if needed. Open the file with newline="".
     """
-    raise NotImplementedError("Task 6E: write write_rejected_csv")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=["source", "row", "field", "reason"])
+        writer.writeheader()
+        writer.writerows(report.rejected_rows())
+    return out_path

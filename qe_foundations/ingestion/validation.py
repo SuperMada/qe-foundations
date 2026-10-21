@@ -31,7 +31,6 @@ def validate_record(row, raw):
         raise MissingFieldError(row, miss[0])
     for field in REQUIRED_FIELDS:
         if raw[field] == None or str(raw[field]).strip() == "":
-            print(field)
             raise MissingFieldError(row, field)
 
     if not isinstance(raw["status"], str):
