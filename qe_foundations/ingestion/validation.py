@@ -8,6 +8,7 @@ See README Task 5 for the exact rules.
 """
 
 from .exceptions import InvalidValueError, MissingFieldError
+import math
 
 REQUIRED_FIELDS = ("id", "title", "status", "duration")
 VALID_STATUSES = ("pass", "fail", "blocked")
@@ -21,4 +22,42 @@ def validate_record(row, raw):
 
     Returns {"id": str, "title": str, "status": str, "duration": float}.
     """
-    raise NotImplementedError("Task 5: write validate_record")
+    if not isinstance(raw, dict):
+        raise InvalidValueError(row, "record", raw, dict)
+    
+    keys = list(raw.keys())
+    miss = [field for field in REQUIRED_FIELDS if field not in raw]
+    if miss:
+        raise MissingFieldError(row, miss[0])
+    for field in REQUIRED_FIELDS:
+        if raw[field] == None or str(raw[field]).strip() == "":
+            print(field)
+            raise MissingFieldError(row, field)
+
+    if not isinstance(raw["status"], str):
+        raise InvalidValueError(row, "status", raw["status"], VALID_STATUSES)
+    if not raw["status"].strip().lower() in VALID_STATUSES:
+        raise InvalidValueError(row, "status", raw["status"], VALID_STATUSES)
+
+
+    if isinstance(raw["duration"], bool):
+        raise InvalidValueError(row, "duration", raw["duration"], float)
+    try:
+        dur = float(raw["duration"])
+    except Exception as e:
+        raise InvalidValueError(row, "duration", raw["duration"], float)
+
+    if not math.isfinite(dur) or dur < 0:
+        raise InvalidValueError(row, "duration", raw["duration"], float)
+
+
+    id = str(raw["id"]).strip()
+
+    return {
+        "id": id,
+        "title": raw["title"].strip(),
+        "status": raw["status"].strip().lower(),
+        "duration": dur
+    }
+
+    
