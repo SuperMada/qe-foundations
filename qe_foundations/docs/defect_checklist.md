@@ -19,10 +19,10 @@ check_exercise.py compares this table with what your queries return.
 | R-06 | 2 | 2 | as we predicted |
 | R-07 | 3 | 3 | as we predicted |
 | R-08 | 3 | 4 | hard to see whitespace in the printed version of the database |
-| R-09 | | | |
-| R-10 | | | |
-| R-11 | | | |
-| R-12 | | | |
+| R-09 | 3 | 2 | missed one, oops |
+| R-10 | 2 | 1 | missed a future date |
+| R-11 | 3 | 3 | as we predicted |
+| R-12 | 4 | 4 | as we predicted |
 
 ## Decoys: rows that look odd but are LEGAL (we must not flag them)
 

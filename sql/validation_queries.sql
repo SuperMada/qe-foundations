@@ -72,41 +72,41 @@ WHERE test_name like "% " or test_name like " %" or suite like "% " or suite lik
 
 -- @rule R-09 | Validity | started_at and finished_at must be present and shaped 'YYYY-MM-DD HH:MM:SS'
 -- TODO: the LIKE pattern _ matches exactly one character; these timestamps are 19 characters long.
-SELECT run_id
+SELECT run_id, started_at, finished_at
 FROM test_runs
-WHERE 1 = 0;
+WHERE started_at is NULL or finished_at is Null or started_at not like "____-__-__ __:__:__" or finished_at not like "____-__-__ __:__:__"
 
 -- @rule R-10 | Consistency | a run cannot finish before it starts, and cannot start in the future
 -- TODO: ISO-format text sorts in time order, so < works on it. date('now') is today.
-SELECT run_id
+SELECT run_id, started_at, finished_at
 FROM test_runs
-WHERE 1 = 0;
+WHERE finished_at < started_at or started_at > date('now')
 
 -- @rule R-11 | Consistency | FAILED/ERROR runs need a failure_message; PASSED runs must not have one
 -- TODO: two sub-rules joined with OR; use parentheses so AND/OR bind the way you mean.
-SELECT run_id
+SELECT run_id, status, failure_message
 FROM test_runs
-WHERE 1 = 0;
+WHERE status in ("FAILED", "ERROR") and (failure_message is Null or trim(failure_message) like "") or status like "PASSED" and failure_message is not Null
 
 -- @rule R-12 | Validity | build_id must be present and look like B-1042 (upper-case 'B', dash, 4 characters)
 -- TODO: careful: LIKE ignores letter case in SQLite -- which function would expose 'b-1044'?
-SELECT run_id
+SELECT run_id, build_id
 FROM test_runs
-WHERE 1 = 0;
+WHERE build_id is Null or not upper(build_id) = build_id or not build_id like "B-____"
 
 -- @rule E-01 | Expectation | run 5001 was saved as expected (test_login_valid_user, SMOKE, QA, PASSED, build B-1042)
 -- @expect 1
 -- TODO: expectation query: name EVERY value you expect; the rule passes when exactly 1 row comes back.
-SELECT run_id
+SELECT run_id, test_name, suite, environment, status, build_id
 FROM test_runs
-WHERE 1 = 0;
+WHERE run_id = 5001 and test_name like "test_login_valid_user" and suite like "SMOKE" and environment like "QA" and status like "PASSED" and build_id like "B-1042"
 
 -- @rule E-02 | Expectation | test-data discovery: the most recent FAILED run in QA exists (exactly one row returned)
 -- @expect 1
 -- TODO: test-data discovery: filter, ORDER BY ... DESC, then keep only the first row.
-SELECT run_id
+SELECT run_id, started_at, environment, test_name
 FROM test_runs
-WHERE 1 = 0;
+WHERE environment like "QA" ORDER BY started_at DESC Limit 1
 
 -- ---------------------------- STRETCH (bonus) --------------------------------
 -- Add these only when R-01..R-12, E-01 and E-02 are done and checked. Use "@expect any"
