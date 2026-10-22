@@ -19,4 +19,8 @@ Requirements (check_exercise.py tests them):
 class ValidationFailedError(Exception):
     """TODO: carry rule_id, description and rows; write a helpful message."""
     # TODO: def __init__(self, rule, rows): ...
-    pass
+    def __init__(self, rule, rows):
+        self.rows = rows
+        self.rule_id = rule.rule_id
+        self.description = f"{self.rule_id} failed: {rule.description}"
+        super().__init__(self.description)
