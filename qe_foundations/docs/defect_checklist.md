@@ -15,10 +15,10 @@ check_exercise.py compares this table with what your queries return.
 | R-02 | 2 | 4 | we forgot we shouldnt get null |
 | R-03 | 4 | 2 | didnt realize we needed null and one of the status had spaces |
 | R-04 | 2 | 2 | as we predicted |
-| R-05 | | | |
-| R-06 | | | |
-| R-07 | | | |
-| R-08 | | | |
+| R-05 | 2 | 2 | as we predicted |
+| R-06 | 2 | 2 | as we predicted |
+| R-07 | 3 | 3 | as we predicted |
+| R-08 | 3 | 4 | hard to see whitespace in the printed version of the database |
 | R-09 | | | |
 | R-10 | | | |
 | R-11 | | | |

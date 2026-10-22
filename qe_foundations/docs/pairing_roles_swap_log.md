@@ -31,8 +31,8 @@ Branch: `feature/sql-validation-...`        Remote: ...
 
 | Block | Clock time | Driver | Navigator | Goal of the block | Result (rules done, commit hash) | Predictions: right / wrong |
 |---|---|---|---|---|---|---|
-| 1 | | | | | | |
-| 2 | | | | | | |
+| 1 | 1:37-2:01 | Philo Girgis | Adam Fischer |R01-R04 | R01-R04 | 50% right |
+| 2 | 2:02-2:14 | Adam Fischer | Philo Girgis | R05-R08 | R05-R08 | 75% right |
 | 3 | | | | | | |
 | 4 | | | | | | |
 | 5 | | | | | | |
