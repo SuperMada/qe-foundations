@@ -11,10 +11,10 @@ check_exercise.py compares this table with what your queries return.
 
 | Rule | Defects found (run_ids) | Predicted (before running) | Notes / surprises |
 |---|---|---|---|
-| R-01 | | | |
-| R-02 | | | |
-| R-03 | | | |
-| R-04 | | | |
+| R-01 | 3 | 3 | as we predicted |
+| R-02 | 2 | 4 | we forgot we shouldnt get null |
+| R-03 | 4 | 2 | didnt realize we needed null and one of the status had spaces |
+| R-04 | 2 | 2 | as we predicted |
 | R-05 | | | |
 | R-06 | | | |
 | R-07 | | | |
