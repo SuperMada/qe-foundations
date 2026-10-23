@@ -270,7 +270,7 @@ def main(argv=None) -> int:
             return 0
 
     for temp in results:
-        if temp.str == "FAIL":
+        if temp.status == "FAIL":
             return 1
 
     return 0
