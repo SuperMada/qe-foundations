@@ -93,23 +93,57 @@ Yes as a driver navigator pair we swapped just about every 30mins. One moment th
 
 <!-- Which rule (R-xx) took longest, and why? Quote the first wrong version of the query and what it returned (too many rows? none? an error?), then what fixed it. -->
 
+R-11 took the longest because we didn't realise that we misspelled error.
+
+SELECT run_id, status, failure_message
+FROM test_runs
+WHERE status in ("FAILED", "ERRROR") and failure_message is Null or status like "PASSED" and failure_message is not Null
+
+R-11 | Consistency | FAILED/ERROR runs need a failure_message; PASSED runs must not have one
+  run_id | status | failure_message                     
+  -------+--------+-------------------------------------
+  5003   | FAILED | NULL                                
+  5012   | PASSED | Warning: slow response on first call
+  (2 row(s))
+
+SELECT run_id, status, failure_message
+FROM test_runs
+WHERE status in ("FAILED", "ERROR") and (failure_message is Null or trim(failure_message) like "") or status like "PASSED" and failure_message is not Null
+
+R-11 | Consistency | FAILED/ERROR runs need a failure_message; PASSED runs must not have one
+  run_id | status | failure_message                     
+  -------+--------+-------------------------------------
+  5003   | FAILED | NULL                                
+  5012   | PASSED | Warning: slow response on first call
+  5033   | ERROR  |                                     
+  (3 row(s))
+
 
 ## A surprise in the data
 
 <!-- Which defect did you NOT expect, or which "defect" turned out to be a legitimate row (a false alarm you avoided or briefly fell for)? What would you ask the product owner about it? -->
+Did not expect 5034 to be a defect for having a lowercase B
+I would ask the product owner if the capitals are really necessary
 
 
 ## SQLite and SQL pitfalls we hit
 
 <!-- NULL behaviour, case sensitivity of = / IN versus LIKE, trailing spaces, inclusive BETWEEN, AND/OR precedence... Which of these bit you, and how will you spot it next time? -->
+We didn't realize that in would pass over Null behavior.
+We will ensure to check Null seperately in the future
 
 
 ## Skills we connected from this week
 
 <!-- Name one thing each from Monday (modules/venv/Git), Tuesday (exceptions/files), Wednesday (logging/unittest/merge conflicts) that you actually used today, and how. -->
+Monday: venv, setting up our environment
+Tuesday: Exceptions, raising validationexception
+Wednesday: Loggging, logging our sql results
+
 
 
 ## What we would do differently
 
 <!-- One process improvement for the next pair session, and one thing you need from Friday (joins, GROUP BY, constraints) to make this validation suite better. -->
-
+We would communicate more often instead of silently working and ignorning our partner
+We could use group by to count the number of passes and fails
