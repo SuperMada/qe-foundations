@@ -35,7 +35,7 @@ Branch: `feature/sql-validation-...`        Remote: ...
 | 2 | 2:02-2:14 | Adam Fischer | Philo Girgis | R05-R08 | R05-R08 | 75% right |
 | 3 | 2:15-2:45 | Philo Girgis | Adam Fischer | R09-R12 & E01-E02 | R09-R12 & E01-E02 | 50% right |
 | 4 | 2:45-3:00::3:20-3:50 | Adam Fischer | Philo Girgis | Python Runner | Logger | N/A |
-| 5 | | | | | | |
+| 5 | 11:30- | Philo Girgis | Adam Fischer | Python Runner & Unit tests | done  | N/A |
 
 ## Disagreements and how we settled them
 

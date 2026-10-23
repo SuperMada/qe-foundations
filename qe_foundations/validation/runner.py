@@ -163,7 +163,7 @@ def run_rule(conn: sqlite3.Connection, rule: Rule) -> list:
     """
     columns, rows = fetch_rows(conn, rule.sql)
     if rule.expect is None:
-        return columns
+        return rows
     if len(rows) == rule.expect:
         return rows
     raise ValidationFailedError(rule, rows)
@@ -191,11 +191,30 @@ def run_all(conn: sqlite3.Connection, rules: List[Rule], logger: logging.Logger)
       * finish with a one-line summary: how many PASS / FAIL / INFO
     Return a list with one RuleResult per rule, in file order.
     """
-    print("Hello")
+    results = []
     for rule in rules:
-        rows = run_rule(conn, rule)
-        for row in rows:
-            print(f"{row}")
+        try:
+            logger.debug(rule.sql)
+            rows = run_rule(conn, rule)
+            if rule.expect is None:
+                logger.info(f"INFO: {rule.rule_id} {rule.dimension} {rule.description}")
+                results.append(RuleResult(rule=rule, status="INFO", rows=rows))
+                print(f"INFO  {rule.rule_id}  {rule.dimension}  {rule.description}")
+            else:
+                logger.info(f"PASS: {rule.rule_id} {rule.dimension} {rule.description}")
+                results.append(RuleResult(rule=rule, status="PASS", rows=rows))
+                print(f"PASS  {rule.rule_id}  {rule.dimension}  {rule.description}")
+        except ValidationFailedError as e:
+            logger.warning(f"FAIL: {rule.rule_id} {rule.dimension} {rule.description} ({len(e.rows)} violating row(s))")
+            print(f"FAIL  {rule.rule_id}  {rule.dimension}  {rule.description}  ({len(e.rows)} violating row(s))")
+            for row in e.rows:
+                print(f"      {row}")
+            results.append(RuleResult(rule=rule, status="FAIL", rows=e.rows))
+        except Exception as e:
+            logger.exception(f"Unexpected error running rule {rule.rule_id}: {e}")
+            raise
+    return results
+            
 
 
 # ---------------------------------------------------------------- command line (PROVIDED + 1 TODO)
@@ -246,6 +265,15 @@ def main(argv=None) -> int:
     #      otherwise return 1   (a non-zero exit code is how CI notices a failure)
     logger = setup_logging(Path(args.log_file))
     results = run_all(conn, rules, logger)
+
+    if args.allow_failures:
+            return 0
+
+    for temp in results:
+        if temp.str == "FAIL":
+            return 1
+
+    return 0
 
 
 
