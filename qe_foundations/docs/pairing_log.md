@@ -35,15 +35,18 @@ Branch: `feature/sql-validation-...`        Remote: ...
 | 2 | 2:02-2:14 | Adam Fischer | Philo Girgis | R05-R08 | R05-R08 | 75% right |
 | 3 | 2:15-2:45 | Philo Girgis | Adam Fischer | R09-R12 & E01-E02 | R09-R12 & E01-E02 | 50% right |
 | 4 | 2:45-3:00::3:20-3:50 | Adam Fischer | Philo Girgis | Python Runner | Logger | N/A |
-| 5 | 11:30-12:00 | Philo Girgis | Adam Fischer | Python Runner & Unit tests | done  | N/A |
-| 6 | 1:00- | Adam Fischer | Philo Girgis | Documentation | | N/A |
+| 5 | 11:30-12:00 | Philo Girgis | Adam Fischer | Python Runner & Unit tests | done | N/A |
+| 6 | 1:00-1:40| Adam Fischer | Philo Girgis | Documentation | half of documents done | N/A |
+| 6 | 1:41- | Philo Girgis | Adam Fischer | Documentation | done all | N/A |
 
 ## Disagreements and how we settled them
 
 <!-- At least one honest example: what did you disagree about (query style, a rule's meaning, ...), and how did you decide? -->
+We disagreed on how to do the logging so we decided to let each of us handle a different section that was causing the errors
 
 
 ## Hints we used
 
 <!-- Which hint levels, for which rules? (Using hints is fine -- hiding it is not.) -->
+We didn't use any of the hints, but we did turn to the internet for assistance
 
