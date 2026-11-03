@@ -1,0 +1,6 @@
+messy.csv,2,status,"Row 2: Value got: skipped, value expected: ('pass', 'fail', 'blocked')"
+messy.csv,3,title,Row 3: Missing feild title
+messy.csv,4,id,Row 4: Already seen test_id: TC-1
+messy.csv,5,duration,"Row 5: Value got: nan, value expected: <class 'float'>"
+messy.csv,8,duration,"Row 8: Value got: -1, value expected: <class 'float'>"
+messy.csv,9,id,Row 9: Missing feild id
